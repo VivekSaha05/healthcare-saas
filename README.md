@@ -4,6 +4,20 @@ A full-stack healthcare SaaS web application built with Next.js 16, Firebase, an
 
 ---
 
+## Live Demo
+
+> Try the deployed version without setting anything up.
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@gmail.com | admin123 |
+
+Sign in at `/login` with the admin credentials to explore the full admin dashboard — doctor management, appointment oversight, and analytics.
+
+To test the patient flow, create a free account via `/signup`.
+
+---
+
 ## Features
 
 ### Patient (User)
