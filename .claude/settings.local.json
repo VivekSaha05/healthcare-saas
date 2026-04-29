@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm uninstall *)",
+      "Bash(node -e \"require\\('firebase/app'\\); console.log\\('firebase OK'\\)\")",
+      "Bash(node -e \"require\\('firebase-admin'\\); console.log\\('firebase-admin OK'\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const p = require\\('./node_modules/firebase/package.json'\\); console.log\\(p.version, p.exports ? 'has exports' : 'no exports'\\)\")",
+      "Bash(node -e \"const p = require\\('./node_modules/firebase/auth/package.json'\\); console.log\\(JSON.stringify\\(p.exports || p.main || p.module, null, 2\\).slice\\(0, 300\\)\\)\")",
+      "Bash(node -e \"const p = require\\('./node_modules/firebase/package.json'\\); const auth = p.exports && p.exports['./auth']; console.log\\(JSON.stringify\\(auth, null, 2\\)\\)\")",
+      "Bash(node *)",
+      "PowerShell(cd \"C:\\\\Users\\\\HP\\\\Documents\\\\Vivek Projects\\\\SaaS-Healthcare-Platform-main\"; $pkg = Get-Content \"node_modules\\\\@firebase\\\\auth\\\\package.json\" | ConvertFrom-Json; Write-Host \"main: $\\($pkg.main\\)\"; Write-Host \"types: $\\($pkg.types\\)\"; Write-Host \"exports keys: $\\(\\($pkg.exports | Get-Member -MemberType NoteProperty\\).Name -join ', '\\)\")",
+      "PowerShell(cd \"C:\\\\Users\\\\HP\\\\Documents\\\\Vivek Projects\\\\SaaS-Healthcare-Platform-main\"; Get-ChildItem \"node_modules\" | Where-Object { $_.Name -eq \"@firebase\" } | Select-Object FullName; Get-ChildItem \"node_modules\\\\@firebase\" | Select-Object Name)",
+      "Bash(python -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('exports:', json.dumps\\(p.get\\('exports', {}\\), indent=2\\)[:3000]\\); print\\('typesVersions:', json.dumps\\(p.get\\('typesVersions', {}\\), indent=2\\)[:1000]\\); print\\('types:', p.get\\('types',''\\)\\); print\\('main:', p.get\\('main',''\\)\\)\")",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\HP\\\\Documents\\\\Vivek Projects\\\\SaaS-Healthcare-Platform-main\\\\src\\\\app\" -Recurse | Where-Object { $_.Name -match \"\\\\.\\(ico|png|svg\\)$\" } | Select-Object Name, FullName)",
+      "PowerShell(Copy-Item *)",
+      "Bash(xargs wc *)"
+    ]
+  }
+}
