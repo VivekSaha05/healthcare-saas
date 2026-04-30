@@ -105,7 +105,7 @@ export async function getBookedTimeSlots(doctorId: string, date: string): Promis
       .collection("appointments")
       .where("doctorId", "==", doctorId)
       .where("date", "==", dateToTimestamp(date))
-      .where("status", "in", ["CONFIRMED", "COMPLETED"])
+      .where("status", "in", ["PENDING", "CONFIRMED", "COMPLETED"])
       .get();
 
     return snap.docs.map((d) => d.data().time as string);
@@ -147,7 +147,7 @@ export async function bookAppointment(input: BookAppointmentInput): Promise<Appo
       date: dateToTimestamp(input.date),
       time: input.time,
       duration: 30,
-      status: "CONFIRMED" as AppointmentStatus,
+      status: "PENDING" as AppointmentStatus,
       reason: input.reason ?? "General consultation",
       notes: null,
       patientName,

@@ -6,10 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function generateAvatar(name: string, gender: "MALE" | "FEMALE") {
-  const username = name.replace(/\s+/g, "").toLowerCase();
-  const base = "https://avatar.iran.liara.run/public";
-  if (gender === "FEMALE") return `${base}/girl?username=${username}`;
-  return `${base}/boy?username=${username}`;
+  const bg = gender === "FEMALE" ? "c2185b" : "004A61";
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${bg}&color=fff&size=128&bold=true&rounded=true`;
 }
 
 export const formatPhoneNumber = (value: string) => {
@@ -17,9 +15,9 @@ export const formatPhoneNumber = (value: string) => {
 
   let digits = value.replace(/\D/g, "");
 
-  if (digits.startsWith("977")) {
-    digits = digits.slice(3);
-  }
+  // Strip any country code prefix (977 Nepal, 91 India)
+  if (digits.startsWith("977")) digits = digits.slice(3);
+  if (digits.startsWith("91") && digits.length > 10) digits = digits.slice(2);
 
   digits = digits.slice(0, 10);
 

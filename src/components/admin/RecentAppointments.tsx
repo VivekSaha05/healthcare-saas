@@ -66,6 +66,7 @@ function RecentAppointments() {
 
   const statusCounts = {
     all: appointments.length,
+    PENDING: appointments.filter((a: any) => a.status === "PENDING").length,
     CONFIRMED: appointments.filter((a: any) => a.status === "CONFIRMED").length,
     COMPLETED: appointments.filter((a: any) => a.status === "COMPLETED").length,
     CANCELLED: appointments.filter((a: any) => a.status === "CANCELLED").length,
@@ -166,7 +167,7 @@ function RecentAppointments() {
                           variant="outline"
                           size="sm"
                           onClick={() => setStatus(appointment.id, "CONFIRMED")}
-                          disabled={disabled || appointment.status === "COMPLETED"}
+                          disabled={disabled || appointment.status !== "PENDING"}
                           className="gap-1 text-xs"
                         >
                           <CheckCircle2 className="size-3" />
@@ -177,7 +178,7 @@ function RecentAppointments() {
                           variant="outline"
                           size="sm"
                           onClick={() => setStatus(appointment.id, "COMPLETED")}
-                          disabled={disabled || appointment.status === "CANCELLED"}
+                          disabled={disabled || !["PENDING", "CONFIRMED"].includes(appointment.status)}
                           className="gap-1 text-xs"
                         >
                           <CheckCircle2 className="size-3" />
@@ -188,7 +189,7 @@ function RecentAppointments() {
                           variant="destructive"
                           size="sm"
                           onClick={() => setStatus(appointment.id, "CANCELLED")}
-                          disabled={disabled || appointment.status === "COMPLETED"}
+                          disabled={disabled || !["PENDING", "CONFIRMED"].includes(appointment.status)}
                           className="gap-1 text-xs"
                         >
                           <XCircle className="size-3" />
@@ -199,10 +200,7 @@ function RecentAppointments() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setStatus(appointment.id, "CONFIRMED")}
-                          disabled={
-                            disabled ||
-                            !["CANCELLED", "PENDING"].includes(appointment.status)
-                          }
+                          disabled={disabled || appointment.status !== "CANCELLED"}
                           className="gap-1 text-xs"
                         >
                           <RotateCcw className="size-3" />
@@ -272,7 +270,7 @@ function RecentAppointments() {
                     variant="outline"
                     size="sm"
                     onClick={() => setStatus(appointment.id, "CONFIRMED")}
-                    disabled={disabled || appointment.status === "COMPLETED"}
+                    disabled={disabled || appointment.status !== "PENDING"}
                     className="flex-1 text-xs"
                   >
                     <CheckCircle2 className="size-3 mr-1" />
@@ -283,7 +281,7 @@ function RecentAppointments() {
                     variant="outline"
                     size="sm"
                     onClick={() => setStatus(appointment.id, "COMPLETED")}
-                    disabled={disabled || appointment.status === "CANCELLED"}
+                    disabled={disabled || !["PENDING", "CONFIRMED"].includes(appointment.status)}
                     className="flex-1 text-xs"
                   >
                     <CheckCircle2 className="size-3 mr-1" />
@@ -294,20 +292,18 @@ function RecentAppointments() {
                     variant="destructive"
                     size="sm"
                     onClick={() => setStatus(appointment.id, "CANCELLED")}
-                    disabled={disabled || appointment.status === "COMPLETED"}
+                    disabled={disabled || !["PENDING", "CONFIRMED"].includes(appointment.status)}
                     className="flex-1 text-xs"
                   >
                     <XCircle className="size-3 mr-1" />
                     Cancel
                   </Button>
+
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setStatus(appointment.id, "CONFIRMED")}
-                    disabled={
-                      disabled ||
-                      !["CANCELLED", "PENDING"].includes(appointment.status)
-                    }
+                    disabled={disabled || appointment.status !== "CANCELLED"}
                     className="flex-1 text-xs"
                   >
                     <RotateCcw className="size-3 mr-1" />

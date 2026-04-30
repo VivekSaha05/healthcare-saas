@@ -15,6 +15,8 @@ export function useGetAppointments() {
   const result = useQuery({
     queryKey: ["getAppointments"],
     queryFn: getAppointments,
+    staleTime: 0,
+    refetchInterval: 30_000, // auto-refresh every 30s so admin sees user-side changes
   });
 
   return result;
@@ -58,6 +60,7 @@ export function useUpdateAppointmentStatus() {
     mutationFn: updateAppointmentStatus,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["getAppointments"] });
+      queryClient.invalidateQueries({ queryKey: ["getUserAppointments"] });
     },
     onError: (error) => console.error("Failed to update appointment:", error),
   });

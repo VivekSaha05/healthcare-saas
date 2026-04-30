@@ -20,7 +20,6 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { formatPhoneNumber } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 interface AddDoctorDialogProps {
@@ -40,11 +39,6 @@ function AddDoctorDialog({ isOpen, onClose }: AddDoctorDialogProps) {
   });
 
   const createDoctorMutation = useCreateDoctor();
-
-  const handlePhoneChange = (value: string) => {
-    const formattedPhoneNumber = formatPhoneNumber(value);
-    setNewDoctor({ ...newDoctor, phone: formattedPhoneNumber });
-  };
 
   const handleSave = () => {
     toast.promise(
@@ -125,7 +119,7 @@ function AddDoctorDialog({ isOpen, onClose }: AddDoctorDialogProps) {
             <Input
               id="new-phone"
               value={newDoctor.phone}
-              onChange={(e) => handlePhoneChange(e.target.value)}
+              onChange={(e) => setNewDoctor({ ...newDoctor, phone: e.target.value })}
               placeholder="+91 900000000"
             />
           </div>

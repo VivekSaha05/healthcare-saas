@@ -1,5 +1,20 @@
 import { useGetDoctors, useDeleteDoctor } from "@/hooks/use-doctors";
 import { useState } from "react";
+
+function DoctorAvatar({ imageUrl, name }: { imageUrl: string; name: string }) {
+  const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=004A61&color=fff&size=128&bold=true&rounded=true`;
+  const [src, setSrc] = useState(imageUrl || fallback);
+  return (
+    <img
+      src={src}
+      alt={name}
+      width={48}
+      height={48}
+      className="size-10 sm:size-12 rounded-full object-cover ring-2 ring-background shrink-0"
+      onError={() => setSrc(fallback)}
+    />
+  );
+}
 import {
   Card,
   CardContent,
@@ -18,7 +33,6 @@ import {
   Filter,
 } from "lucide-react";
 import { Button } from "../ui/button";
-import Image from "next/image";
 import { Badge } from "../ui/badge";
 import {
   AlertDialog,
@@ -161,25 +175,13 @@ function DoctorsManagement() {
         <CardContent className="p-4 sm:p-6 pt-0">
           <div className="space-y-3 sm:space-y-4">
             {filteredDoctors.map((doctor) => {
-              const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name)}&background=random&size=128&bold=true&rounded=true`;
-              
               return (
                 <div
                   key={doctor.id}
                   className="flex flex-col lg:flex-row lg:items-center justify-between p-3 sm:p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-md transition-all gap-4"
                 >
                   <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                    <Image
-                      src={doctor.imageUrl || avatarUrl}
-                      alt={doctor.name}
-                      width={48}
-                      height={48}
-                      className="size-10 sm:size-12 rounded-full object-cover ring-2 ring-background shrink-0"
-                      unoptimized
-                      onError={(e) => {
-                        e.currentTarget.src = avatarUrl;
-                      }}
-                    />
+                    <DoctorAvatar imageUrl={doctor.imageUrl} name={doctor.name} />
 
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-sm sm:text-base truncate">{doctor.name}</div>

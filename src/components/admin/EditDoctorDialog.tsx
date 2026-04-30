@@ -1,5 +1,4 @@
 import { useUpdateDoctor } from "@/hooks/use-doctors";
-import { formatPhoneNumber } from "@/lib/utils";
 import type { Doctor, Gender } from "@/lib/types";
 import { useState } from "react";
 import {
@@ -32,13 +31,6 @@ function EditDoctorDialog({ doctor, isOpen, onClose }: EditDoctorDialogProps) {
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(doctor);
 
   const updateDoctorMutation = useUpdateDoctor();
-
-  const handlePhoneChange = (value: string) => {
-    const formattedPhoneNumber = formatPhoneNumber(value);
-    if (editingDoctor) {
-      setEditingDoctor({ ...editingDoctor, phone: formattedPhoneNumber });
-    }
-  };
 
   const handleSave = () => {
     if (editingDoctor) {
@@ -112,7 +104,7 @@ function EditDoctorDialog({ doctor, isOpen, onClose }: EditDoctorDialogProps) {
               <Input
                 id="phone"
                 value={editingDoctor.phone}
-                onChange={(e) => handlePhoneChange(e.target.value)}
+                onChange={(e) => setEditingDoctor({ ...editingDoctor!, phone: e.target.value })}
                 placeholder="+91 900000000"
               />
             </div>

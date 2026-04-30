@@ -87,28 +87,30 @@ export default function AdminAnalytics() {
   }
 
   const statusData = [
+    { name: "Pending",   value: data.statusCounts.PENDING,   color: COLORS.PENDING },
     { name: "Confirmed", value: data.statusCounts.CONFIRMED, color: COLORS.CONFIRMED },
     { name: "Completed", value: data.statusCounts.COMPLETED, color: COLORS.COMPLETED },
     { name: "Cancelled", value: data.statusCounts.CANCELLED, color: COLORS.CANCELLED },
-  ];
+  ].filter((s) => s.value > 0);
 
   // Calculate metrics
   const totalAppointments = Object.values(data.statusCounts).reduce((a: number, b: number) => a + b, 0);
-  const completionRate = totalAppointments > 0 
-    ? ((data.statusCounts.COMPLETED / totalAppointments) * 100).toFixed(1) 
+  const completionRate = totalAppointments > 0
+    ? ((data.statusCounts.COMPLETED / totalAppointments) * 100).toFixed(1)
     : 0;
   const cancellationRate = totalAppointments > 0
     ? ((data.statusCounts.CANCELLED / totalAppointments) * 100).toFixed(1)
     : 0;
-  
-  // Calculate trend (compare last day vs previous average)
-  const lastDayCount = data.daily[data.daily.length - 1]?.count || 0;
-  const avgPreviousDays = data.daily.length > 1
-    ? data.daily.slice(0, -1).reduce((sum: number, day: any) => sum + day.count, 0) / (data.daily.length - 1)
-    : 0;
-  const trend = avgPreviousDays > 0 
-    ? (((lastDayCount - avgPreviousDays) / avgPreviousDays) * 100).toFixed(1)
-    : 0;
+
+  // Active doctors from totals (not filtered topDoctors)
+  const activeDoctorsCount = data.totals?.activeDoctors ?? data.topDoctors.filter((d: any) => d.isActive).length;
+  const totalDoctorsCount = data.totals?.totalDoctors ?? data.topDoctors.length;
+
+  // Format daily dates: "2026-04-24" → "Apr 24"
+  const formattedDaily = data.daily.map((d: any) => ({
+    ...d,
+    day: new Date(d.day + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+  }));
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -122,22 +124,6 @@ export default function AdminAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAppointments}</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              {Number(trend) > 0 ? (
-                <>
-                  <TrendingUp className="size-3 text-green-500" />
-                  <span className="text-green-500">+{trend}%</span>
-                </>
-              ) : Number(trend) < 0 ? (
-                <>
-                  <TrendingDown className="size-3 text-red-500" />
-                  <span className="text-red-500">{trend}%</span>
-                </>
-              ) : (
-                <span>No change</span>
-              )}
-              <span className="ml-1">from avg</span>
-            </p>
           </CardContent>
         </Card>
 
@@ -149,9 +135,6 @@ export default function AdminAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{completionRate}%</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {data.statusCounts.COMPLETED} completed appointments
-            </p>
           </CardContent>
         </Card>
 
@@ -162,12 +145,8 @@ export default function AdminAnalytics() {
             <Users className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {data.topDoctors.filter((d: any) => d.isActive).length}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              of {data.topDoctors.length} total doctors
-            </p>
+            <div className="text-2xl font-bold">{activeDoctorsCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">of {totalDoctorsCount} total</p>
           </CardContent>
         </Card>
 
@@ -179,9 +158,6 @@ export default function AdminAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{cancellationRate}%</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {data.statusCounts.CANCELLED} cancelled appointments
-            </p>
           </CardContent>
         </Card>
       </div>
@@ -198,31 +174,31 @@ export default function AdminAnalytics() {
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.daily}>
+              <AreaChart data={formattedDaily}>
                 <defs>
                   <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#004A61" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#004A61" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="#6b7280" />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12 }} stroke="#6b7280" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'rgba(255,255,255,0.95)',
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                   }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="count" 
-                  stroke="#3b82f6" 
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#004A61"
                   strokeWidth={3}
                   fill="url(#colorCount)"
-                  dot={{ fill: '#3b82f6', r: 4 }}
+                  dot={{ fill: '#004A61', r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </AreaChart>
@@ -239,33 +215,34 @@ export default function AdminAnalytics() {
             </CardTitle>
           </CardHeader>
           <CardContent className="h-72 flex flex-col">
-            <ResponsiveContainer width="100%" height="70%">
+            <ResponsiveContainer width="100%" height="75%">
               <PieChart>
-                <Pie 
-                  data={statusData} 
-                  dataKey="value" 
-                  nameKey="name" 
-                  cx="50%" 
-                  cy="50%" 
+                <Pie
+                  data={statusData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
                   outerRadius={70}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}
                 >
                   {statusData.map((entry, idx) => (
                     <Cell key={idx} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value: number, name: string) => [`${value} (${totalAppointments > 0 ? ((value / totalAppointments) * 100).toFixed(1) : 0}%)`, name]}
+                />
               </PieChart>
             </ResponsiveContainer>
-            <div className="grid grid-cols-2 gap-2 mt-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-2">
               {statusData.map((status) => {
-                const Icon = STATUS_ICONS[status.name.toUpperCase() as keyof typeof STATUS_ICONS];
+                const pct = totalAppointments > 0 ? ((status.value / totalAppointments) * 100).toFixed(0) : 0;
                 return (
-                  <div key={status.name} className="flex items-center gap-2">
-                    <div className="size-3 rounded-full" style={{ backgroundColor: status.color }} />
-                    <Icon className="size-3" style={{ color: status.color }} />
-                    <span className="text-xs font-medium">{status.name}</span>
+                  <div key={status.name} className="flex items-center gap-1.5">
+                    <div className="size-2.5 rounded-full shrink-0" style={{ backgroundColor: status.color }} />
+                    <span className="text-xs font-medium truncate">{status.name}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{pct}%</span>
                   </div>
                 );
               })}
@@ -405,18 +382,19 @@ export default function AdminAnalytics() {
                   stroke="#6b7280"
                 />
                 <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                <Tooltip
+                  cursor={{ fill: 'rgba(0, 74, 97, 0.08)' }}
+                  contentStyle={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px'
                   }}
                 />
-                <Bar 
-                  dataKey="count" 
-                  fill="#3b82f6" 
+                <Bar
+                  dataKey="count"
+                  fill="#004A61"
                   radius={[8, 8, 0, 0]}
-                  activeBar={{ fill: '#2563eb' }}
+                  activeBar={{ fill: '#00698a' }}
                 />
               </BarChart>
             </ResponsiveContainer>

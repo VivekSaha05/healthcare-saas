@@ -1,10 +1,25 @@
 import { useAvailableDoctors } from "@/hooks/use-doctors";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import Image from "next/image";
+import { useState } from "react";
 import { MapPinIcon, PhoneIcon, StarIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { DoctorCardsLoading } from "./DoctorCardsLoading";
+
+function DoctorAvatar({ imageUrl, name }: { imageUrl: string; name: string }) {
+  const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=004A61&color=fff&size=128&bold=true&rounded=true`;
+  const [src, setSrc] = useState(imageUrl || fallback);
+  return (
+    <img
+      src={src}
+      alt={name}
+      width={64}
+      height={64}
+      className="w-16 h-16 rounded-full object-cover"
+      onError={() => setSrc(fallback)}
+    />
+  );
+}
 
 interface DoctorSelectionStepProps {
   selectedDentistId: string | null;
@@ -37,8 +52,6 @@ function DoctorSelectionStep({
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {dentists.map((dentist) => {
-          const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(dentist.name)}&background=random&size=128&bold=true&rounded=true`;
-          
           return (
             <Card
               key={dentist.id}
@@ -49,17 +62,7 @@ function DoctorSelectionStep({
             >
               <CardHeader className="pb-4">
                 <div className="flex items-start gap-4">
-                  <Image
-                    src={dentist.imageUrl || avatarUrl}
-                    alt={dentist.name}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 rounded-full object-cover"
-                    unoptimized
-                    onError={(e) => {
-                      e.currentTarget.src = avatarUrl;
-                    }}
-                  />
+                  <DoctorAvatar imageUrl={dentist.imageUrl} name={dentist.name} />
                   <div className="flex-1">
                     <CardTitle className="text-lg">{dentist.name}</CardTitle>
                     <CardDescription className="text-primary font-medium">
